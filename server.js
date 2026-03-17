@@ -17,8 +17,8 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "http://127.0.0.1:[본인의 포트번호]",
-      "http://localhost:[본인의 포트번호]",
+      "http://127.0.0.1:5500",
+      "http://localhost:5500",
     ],
     methods: ["OPTIONS", "POST", "GET", "DELETE"],
     credentials: true,
@@ -42,8 +42,10 @@ app.post("/", (req, res) => {
   } else {
     // 1. 유저정보가 있는 경우 accessToken을 발급하는 로직을 작성하세요.(sign)
     // 이곳에 코드를 작성하세요.
+      const accessToken = jwt.sign({ userId: userInfo.user_id }, secretKey, { expiresIn: "1h" });
     // 2. 응답으로 accessToken을 클라이언트로 전송하세요. (res.send 사용)
     // 이곳에 코드를 작성하세요.
+    res.send({ accessToken });
   }
 });
 
@@ -51,8 +53,13 @@ app.post("/", (req, res) => {
 app.get("/", (req, res) => {
   // 3. req headers에 담겨있는 accessToken을 검증하는 로직을 작성하세요.(verify)
   // 이곳에 코드를 작성하세요.
+  const accessToken = req.headers.authorization?.split(" ")[1];
+  if (!accessToken) {
+    return res.status(401).send("Access token is missing");
+  }
   // 4. 검증이 완료되면 유저정보를 클라이언트로 전송하세요.(res.send 사용)
   // 이곳에 코드를 작성하세요.
+  res.send("인증 성공");
 });
 
 app.listen(3000, () => console.log("서버 실행!"));
